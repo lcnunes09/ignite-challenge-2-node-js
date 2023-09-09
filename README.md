@@ -2,8 +2,8 @@
 
 ## Business Rules
 
-- [ ] It should be possible to create a user, with the following information: `name`, `image`, `email`, `create date`.
-- [ ] It should be possible to identify the user between requests
+- [x] It should be possible to create a user, with the following information: `name`, `image`, `email`, `create date`.
+- [ ] It should be possible to identify the user between requests: `session_id`
 - [ ] It should be possible to register a meal made, with the following information: `name`, `description`, `create date and time`, `is it on or off the diet`. The meals should be associated to a user.
 - [ ] It should be possible to edit a meal, editing all information above, apart from the user.
 - [ ] It should be possible to delete a meal.
