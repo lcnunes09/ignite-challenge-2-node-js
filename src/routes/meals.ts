@@ -2,6 +2,7 @@ import { randomUUID } from "crypto"
 import { FastifyInstance } from "fastify"
 import { knex } from '../database'
 import { z } from 'zod'
+import { checkSessionIdExists } from '../middlewares/check-session-id-exists'
 
 export async function mealsRoutes(app: FastifyInstance) {
 
@@ -37,7 +38,9 @@ export async function mealsRoutes(app: FastifyInstance) {
         }
     })
 
-    app.get('/:user_id', async (request, reply) => {
+    app.get('/:user_id', {
+        preHandler: [checkSessionIdExists],
+    }, async (request, reply) => {
         try {
             const getMealsParamsSchema = z.object({
                 user_id: z.string().uuid(),
