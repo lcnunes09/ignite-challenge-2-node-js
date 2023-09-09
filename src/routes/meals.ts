@@ -76,4 +76,24 @@ export async function mealsRoutes(app: FastifyInstance) {
             return reply.status(500).send({ error: 'Internal Server Error' });
         }
     })
+
+    app.delete('/:user_id/:meal_id', async (request, reply) => {
+        try {
+            const deleteMealParamsSchema = z.object({
+                user_id: z.string().uuid(),
+                meal_id: z.string().uuid(),
+            })
+            
+            const { user_id, meal_id } = deleteMealParamsSchema.parse(request.params)
+
+            await knex('meals')
+                .where({ user_id, id: meal_id })
+                .delete()
+
+            return reply.status(204).send()
+        } catch (error) {
+            console.error("Error while deleting meal:", error);
+            return reply.status(500).send({ error: 'Internal Server Error' });
+        }
+    })
 }
