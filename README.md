@@ -8,7 +8,7 @@
 - [ ] It should be possible to edit a meal, editing all information above, apart from the user.
 - [ ] It should be possible to delete a meal.
 - [x] It should be possible to list all user meal.
-- [ ] It should be possible to see a specific meal.
+- [x] It should be possible to see a specific meal.
 - [ ] It should be possible to get user metrics, such as:
   - [ ] Total of meals created
   - [ ] Total of meals created that were on the diet

@@ -55,4 +55,25 @@ export async function mealsRoutes(app: FastifyInstance) {
             return reply.status(500).send({ error: 'Internal Server Error' });
         }
     })
+
+    app.get('/:user_id/:meal_id', async (request, reply) => {
+        try {
+            const getMealParamsSchema = z.object({
+                user_id: z.string().uuid(),
+                meal_id: z.string().uuid(),
+            })
+            
+            const { user_id, meal_id } = getMealParamsSchema.parse(request.params)
+
+            const meal = await knex('meals')
+                .select('*')
+                .where({ user_id, id: meal_id })
+                .first()
+
+            return reply.status(200).send(meal)
+        } catch (error) {
+            console.error("Error while getting meal:", error);
+            return reply.status(500).send({ error: 'Internal Server Error' });
+        }
+    })
 }
