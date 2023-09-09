@@ -3,7 +3,7 @@ import 'dotenv/config'
 import { env } from './env'
 
 export const config: Knex.Config = {
-  client: 'sqlite',
+  client: env.DATABASE_CLIENT,
   connection: {
     filename: env.DATABASE_URL,
   },
