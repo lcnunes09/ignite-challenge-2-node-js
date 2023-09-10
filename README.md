@@ -9,7 +9,7 @@
 - [x] It should be possible to delete a meal.
 - [x] It should be possible to list all user meal.
 - [x] It should be possible to see a specific meal.
-- [ ] It should be possible to get user metrics, such as:
+- [x] It should be possible to get user metrics, such as:
   - [x] Total of meals created
   - [x] Total of meals created that were on the diet
   - [x] Total of meals created that were off the diet

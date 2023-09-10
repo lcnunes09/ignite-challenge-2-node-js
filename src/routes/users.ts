@@ -25,16 +25,20 @@ export async function usersRoutes(app: FastifyInstance) {
             })
         }
 
+        const user_id = randomUUID(); 
+
         await knex('users')
             .insert({
-                id: randomUUID(),
+                id: user_id,
                 email,
                 name,
                 image,
                 session_id: sessionId,
             })
 
-        return reply.status(201).send()
+        return reply.status(201).send({
+            user_id
+        })
     })
 
     app.get('/', async (request) => {
@@ -44,5 +48,19 @@ export async function usersRoutes(app: FastifyInstance) {
         return {
             users
         }
+    })
+
+    app.delete('/:user_id', async (request, reply) => {
+        const deleteUsersParamsSchema = z.object({
+            user_id: z.string().uuid(),
+        })
+        
+        const { user_id } = deleteUsersParamsSchema.parse(request.params)
+
+        await knex('users')
+            .delete()
+            .where({ id: user_id })
+
+        return reply.status(204).send()
     })
 }

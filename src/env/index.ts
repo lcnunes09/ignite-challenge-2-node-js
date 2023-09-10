@@ -1,4 +1,4 @@
-import 'dotenv/config' 
+import { config } from 'dotenv'
 import { z } from 'zod'
 
 const envSchema = z.object({
@@ -7,6 +7,12 @@ const envSchema = z.object({
     DATABASE_URL: z.string(),
     PORT: z.number().default(3000),
 })
+
+if (process.env.NODE_ENV === 'test') {
+    config({ path: '.env.test' })
+} else {
+    config()
+}
 
 const _env = envSchema.safeParse(process.env)
 

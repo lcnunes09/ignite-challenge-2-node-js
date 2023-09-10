@@ -24,16 +24,20 @@ export async function mealsRoutes(app: FastifyInstance) {
             
             const { name, description, on_diet } = createMealsSchema.parse(request.body)
 
+            const meal_id = randomUUID()
+
             await knex('meals')
                 .insert({
-                    id: randomUUID(),
+                    id: meal_id,
                     user_id,
                     name,
                     description,
                     on_diet,
                 })
 
-            return reply.status(201).send()
+            return reply.status(201).send(({
+                id: meal_id
+            }))
         } catch (error) {
             console.error("Error while inserting a new meal:", error);
             return reply.status(500).send({ error: 'Internal Server Error' });
@@ -173,7 +177,7 @@ export async function mealsRoutes(app: FastifyInstance) {
                 return reply.status(404).send({ error: 'Unauthorized' });
             }
 
-            return reply.status(204).send()
+            return reply.status(200).send({ id: meal_id })
         } catch (error) {
             console.error("Error while updating meal:", error);
             return reply.status(500).send({ error: 'Internal Server Error' });
