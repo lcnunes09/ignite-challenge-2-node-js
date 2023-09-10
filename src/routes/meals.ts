@@ -127,9 +127,13 @@ export async function mealsRoutes(app: FastifyInstance) {
             
             const { user_id, meal_id } = deleteMealParamsSchema.parse(request.params)
 
-            await knex('meals')
+            const deleteMeal = await knex('meals')
                 .where({ user_id, id: meal_id })
                 .delete()
+            
+            if (deleteMeal === 0) {
+                return reply.status(404).send({ error: 'Unauthorized' });
+            }
 
             return reply.status(204).send()
         } catch (error) {

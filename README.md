@@ -13,5 +13,5 @@
   - [x] Total of meals created
   - [x] Total of meals created that were on the diet
   - [x] Total of meals created that were off the diet
-  - [ ] Best streak days on the diet
+  - [x] Best streak days on the diet
 - [x] The user can only see, edit and delete the meals that their created
