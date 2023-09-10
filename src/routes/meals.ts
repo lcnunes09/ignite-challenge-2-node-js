@@ -59,16 +59,34 @@ export async function mealsRoutes(app: FastifyInstance) {
             const mealsOnOrOffDiet = await knex('meals')
                 .select('*')
                 .where({ user_id, on_diet: true })
+                .orderBy('created_at', 'desc')
 
             const totalMealsOnDiet = mealsOnOrOffDiet.length
             const totalMealsOffDiet = totalMeals - totalMealsOnDiet
+
+            let currentStreakCount = 0
+            let bestStreakCount = 0
+
+            mealsOnOrOffDiet.forEach((meal) => {
+                if (meal.on_diet) {
+                    currentStreakCount++
+
+                    if (currentStreakCount > bestStreakCount) {
+                        bestStreakCount = currentStreakCount
+                    }
+                } else {
+                    currentStreakCount = 0
+                }
+            })
 
             return reply.status(200).send({
                 meals,
                 totalMeals: meals.length,
                 totalMealsOnDiet,
                 totalMealsOffDiet,
-            })
+                currentStreakCount,
+                bestStreakCount,
+          })
         } catch (error) {
             console.error("Error while getting meals:", error);
             return reply.status(500).send({ error: 'Internal Server Error' });
