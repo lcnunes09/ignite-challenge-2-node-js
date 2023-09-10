@@ -6,7 +6,9 @@ import { checkSessionIdExists } from '../middlewares/check-session-id-exists'
 
 export async function mealsRoutes(app: FastifyInstance) {
 
-    app.post('/:user_id', async (request, reply) => {
+    app.post('/:user_id', {
+        preHandler: [checkSessionIdExists],
+    }, async (request, reply) => {
         try {
             const createMealsSchema = z.object({
                 name: z.string(),
@@ -51,15 +53,31 @@ export async function mealsRoutes(app: FastifyInstance) {
             const meals = await knex('meals')
                 .select('*')
                 .where({ user_id })
+            
+            const totalMeals = meals.length
 
-            return reply.status(200).send(meals)
+            const mealsOnOrOffDiet = await knex('meals')
+                .select('*')
+                .where({ user_id, on_diet: true })
+
+            const totalMealsOnDiet = mealsOnOrOffDiet.length
+            const totalMealsOffDiet = totalMeals - totalMealsOnDiet
+
+            return reply.status(200).send({
+                meals,
+                totalMeals: meals.length,
+                totalMealsOnDiet,
+                totalMealsOffDiet,
+            })
         } catch (error) {
             console.error("Error while getting meals:", error);
             return reply.status(500).send({ error: 'Internal Server Error' });
         }
     })
 
-    app.get('/:user_id/:meal_id', async (request, reply) => {
+    app.get('/:user_id/:meal_id', {
+        preHandler: [checkSessionIdExists],
+    }, async (request, reply) => {
         try {
             const getMealParamsSchema = z.object({
                 user_id: z.string().uuid(),
@@ -80,7 +98,9 @@ export async function mealsRoutes(app: FastifyInstance) {
         }
     })
 
-    app.delete('/:user_id/:meal_id', async (request, reply) => {
+    app.delete('/:user_id/:meal_id', {
+        preHandler: [checkSessionIdExists],
+    }, async (request, reply) => {
         try {
             const deleteMealParamsSchema = z.object({
                 user_id: z.string().uuid(),
@@ -96,6 +116,44 @@ export async function mealsRoutes(app: FastifyInstance) {
             return reply.status(204).send()
         } catch (error) {
             console.error("Error while deleting meal:", error);
+            return reply.status(500).send({ error: 'Internal Server Error' });
+        }
+    })
+
+    app.put('/:user_id/:meal_id', {
+        preHandler: [checkSessionIdExists],
+    }, async (request, reply) => {
+        try {
+            const updateMealParamsSchema = z.object({
+                user_id: z.string().uuid(),
+                meal_id: z.string().uuid(),
+            })
+            
+            const { user_id, meal_id } = updateMealParamsSchema.parse(request.params)
+
+            const updateMealSchema = z.object({
+                name: z.string(),
+                description: z.string(),
+                on_diet: z.boolean()
+            })
+
+            const { name, description, on_diet } = updateMealSchema.parse(request.body)
+
+            const updateMeal = await knex('meals')
+                .where({ user_id, id: meal_id })
+                .update({
+                    name,
+                    description,
+                    on_diet,
+                })
+            
+            if (updateMeal === 0) {
+                return reply.status(404).send({ error: 'Unauthorized' });
+            }
+
+            return reply.status(204).send()
+        } catch (error) {
+            console.error("Error while updating meal:", error);
             return reply.status(500).send({ error: 'Internal Server Error' });
         }
     })
